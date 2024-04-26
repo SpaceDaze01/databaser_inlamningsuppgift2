@@ -55,6 +55,33 @@ server.get('/api/books', async (req, res) => {
   }
 });
 
+//filtrera page och limit
+server.get('/api/books/filter', async (req, res, next) => {
+  try {
+
+    const { page, limit } = req.query;
+    console.log(page)
+    console.log(limit)
+    const booksPagination = await Book.find()
+
+      .limit(limit * 1)
+
+      .skip((page - 1) * limit)
+
+      .sort({ createdAt: -1 })
+
+
+    const count = await Book.countDocuments();
+
+    return res.status(200).json({
+      booksPagination,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 
 //findById: hämtar ett dokument (book) baserat på ID 
 server.get('/api/books/:id', async (req, res) => {
