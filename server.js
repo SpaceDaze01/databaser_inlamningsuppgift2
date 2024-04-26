@@ -3,7 +3,6 @@ import express from "express"
 import mongoose from "mongoose"
 
 
-
 // Skapar en instans av Express-appen, detta är vår webbserver.
 const server = express()
 
@@ -38,33 +37,33 @@ const Book = mongoose.model('books', booksSchema);
 
 /*
   Skapar en GET - route på '/api/books'. 
-  När denna route anropas, hämtar den alla dokument från vår "books"-collection och skickar tillbaka dem som en JSON-response.
+  route anropas, hämtar den alla dokument från vår "books"-collection och skickar tillbaka dem som en JSON-response.
 */
 server.get('/api/books', async (req, res) => {
   res.json(await Book.find())
-    ;  // Använder Mongoose's "find"-metod för att hämta alla "books".
+    ;  
 });
 
 
-//find()-metoden: felmeddelande om det uppstår problem med att hämta böcker
+//find()-metoden: felmeddelande om det uppstår problem med att hämta book
 server.get('/api/books', async (req, res) => {
   try {
     const books = await Book.find();
-    req.json(books); // Skickar en array av alla användare som JSON.
+    req.json(books); // Skickar en array av alla books som JSON.
   } catch (error) {
     res.status(500).json({ message: "Something went wrong with the server when trying to get the books" });
   }
 });
 
 
-//findById: hämtar ett dokument (bok) baserat på ID 
+//findById: hämtar ett dokument (book) baserat på ID 
 server.get('/api/books/:id', async (req, res) => {
   try {
     const bookId = await Book.findById(req.params.id);
     if (!bookId) {
       return res.status(404).json({ message: "The book could not be found" });
     }
-    res.json(bookId); // Skickar användaren som JSON.
+    res.json(bookId); // Skickar book som JSON.
   } catch (error) {
     res.status(500).json({ message: "Something went wrong with the server when trying to get one specific book by id" });
   }
@@ -72,7 +71,7 @@ server.get('/api/books/:id', async (req, res) => {
 
 
 
-//save: möjlighet att skapa en POST request (lägga till en ny bok med info) 
+//save: möjlighet att skapa en POST request (lägga till en ny book med info) 
 server.post('/api/books', async (req, res) => {
   const newBook = new Book(req.body);
   try {
@@ -84,14 +83,14 @@ server.post('/api/books', async (req, res) => {
 });
 
 
-//findByIdAndUpdate: låter dig uppdatera ett dokument (bok) baserat på dess ID
+//findByIdAndUpdate: låter dig uppdatera ett dokument (book) baserat på dess ID
 server.put('/api/books/:id', async (req, res) => {
   try {
     const updatedBook = await Book.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!updatedBook) {
       return res.status(404).json({ message: "The book could not be found" });
     }
-    res.json(updatedBook); // Skickar den uppdaterade boken som JSON.
+    res.json(updatedBook); // Skickar den uppdaterade book som JSON.
   } catch (error) {
     res.status(500).json({ message: "Something went wrong with the server when trying to update a specific book by id" });
   }
@@ -99,7 +98,7 @@ server.put('/api/books/:id', async (req, res) => {
 
 
 
-//findByIdAndDelete: Låter dig radera ett dokument baserat på dess ID
+//findByIdAndDelete: Låter dig radera ett book-dokument baserat på dess ID
 server.delete('/api/books/:id', async (req, res) => {
   try {
     const deletedBook = await Book.findByIdAndDelete(req.params.id);
