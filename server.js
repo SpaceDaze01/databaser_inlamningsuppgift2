@@ -1,7 +1,7 @@
 // Importera Express för att kunna skapa en webbserver och Mongoose för att interagera med MongoDB-databasen.
 import express from "express"
 import mongoose from "mongoose"
-
+import { rateLimit } from 'express-rate-limit'
 
 // Skapar en instans av Express-appen, detta är vår webbserver.
 const server = express()
@@ -16,7 +16,15 @@ server.use(express.json())
 
 mongoose.connect("mongodb+srv://Hayden01:MusicAndArtLover@Cluster0.u8qd0bq.mongodb.net/BookFinder")
 
+//limiting och throttling- hanterar olika belastningsnivåer och effektivt hantera flera förfrågningar samtidigt
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, 
+  limit: 100,
+  message: 'to many requests on this IP, try again soon' 
+});
 
+// Applicera rate limiter på alla API-förfrågningar
+server.use('/api/', apiLimiter);
 
 
 // Skapar ett schema för "books", vilket definierar strukturen för varje "book"-dokument i databasen.
@@ -60,8 +68,7 @@ server.get('/api/books/filter', async (req, res, next) => {
   try {
 
     const { page, limit } = req.query;
-    console.log(page)
-    console.log(limit)
+ 
     const booksPagination = await Book.find()
 
       .limit(limit * 1)
@@ -97,6 +104,14 @@ server.get('/api/books/:id', async (req, res) => {
 });
 
 
+//gör en POST
+/*mongoose.disconnect()*/
+/*server.post('/api/books/disconnect', async (req, res) => {
+  res.json(await mongoose.disconnect());
+  console.log("succesful disconnect")
+  
+})
+*/
 
 //save: möjlighet att skapa en POST request (lägga till en ny book med info) 
 server.post('/api/books', async (req, res) => {
